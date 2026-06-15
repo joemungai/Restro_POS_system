@@ -1,33 +1,56 @@
+// TableCard.jsx
+// Displays a single restaurant table's status and assigned waiter avatar.
+// Used in the Tables page to render a grid of all tables.
+
 import React from "react";
-import { useNavigate } from "react-router-dom";
-import { getAvatarName, getBgColor } from "../../utils"
-import { useDispatch } from "react-redux";
-import { updateTable } from "../../redux/slices/customerSlice";
-import { FaLongArrowAltRight } from "react-icons/fa";
+import { getBgColor } from "../../utils"; // Returns a random hex color string e.g. "#f6b100"
 
-const TableCard = ({id, name, status, initials, seats}) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const handleClick = (name) => {
-    if(status === "Booked") return;
-
-    const table = { tableId: id, tableNo: name }
-    dispatch(updateTable({table}))
-    navigate(`/menu`);
-  };
-
+// ─────────────────────────────────────────────────────────────
+// TableCard Component
+// ─────────────────────────────────────────────────────────────
+// Props:
+//   key      (number/string) — unique identifier for React list rendering
+//   name     (string)        — table label e.g. "Table 1"
+//   status   (string)        — "Booked" | "Available"
+//   initials (string)        — 2-letter waiter initials e.g. "AM", "MB"
+const TableCard = ({ key, name, status, initials }) => {
   return (
-    <div onClick={() => handleClick(name)} key={id} className="w-[300px] hover:bg-[#2c2c2c] bg-[#262626] p-4 rounded-lg cursor-pointer">
+    // Card wrapper — fixed width, dark background, hover effect, pointer cursor
+    <div
+      key={key}
+      className="w-[300px] hover:bg-[#2c2c2c] bg-[#262626] p-4 rounded-lg cursor-pointer"
+    >
+      {/* ── Top Row: Table name + Status badge ── */}
       <div className="flex items-center justify-between px-1">
-        <h1 className="text-[#f5f5f5] text-xl font-semibold">Table <FaLongArrowAltRight className="text-[#ababab] ml-2 inline" /> {name}</h1>
-        <p className={`${status === "Booked" ? "text-green-600 bg-[#2e4a40]" : "bg-[#664a04] text-white"} px-2 py-1 rounded-lg`}>
+
+        {/* Table name e.g. "Table 1" */}
+        <h1 className="text-[#f5f5f5] text-xl font-semibold">{name}</h1>
+
+        {/* Status badge — green tint for Booked, yellow/brown tint for Available */}
+        <p
+          className={`${
+            status === "Booked"
+              ? "text-green-600 bg-[#2e4a40]"  // Booked: green text on dark green bg
+              : "bg-[#664a04] text-white"        // Available: white text on dark yellow bg
+          } px-2 py-1 rounded-lg`}
+        >
           {status}
         </p>
+
       </div>
-      <div className="flex items-center justify-center mt-5 mb-8">
-        <h1 className={`text-white rounded-full p-5 text-xl`} style={{backgroundColor : initials ? getBgColor() : "#1f1f1f"}} >{getAvatarName(initials) || "N/A"}</h1>
+
+      {/* ── Center: Waiter avatar circle ──
+          getBgColor() returns a random hex color string from utils/index.jsx.
+          Applied via inline style since it's a hex value, not a Tailwind class.  */}
+      <div className="flex items-center justify-center mt-5 mb-5">
+        <h1
+          className="text-white rounded-full p-5 text-xl"
+          style={{ backgroundColor: getBgColor() }}  /* ← inline style for hex value */
+        >
+          {initials}
+        </h1>
       </div>
-      <p className="text-[#ababab] text-xs">Seats: <span className="text-[#f5f5f5]">{seats}</span></p>
+
     </div>
   );
 };
